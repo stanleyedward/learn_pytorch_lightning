@@ -1,5 +1,3 @@
-from typing import Any
-from lightning.pytorch.utilities.types import STEP_OUTPUT, OptimizerLRScheduler
 import torch
 import torch.nn.functional as F
 import torchvision.datasets as datasets
@@ -10,66 +8,51 @@ from tqdm import tqdm
 from torch.utils.data import random_split
 import lightning as L
 
-# class NN(nn.Module):
-#     def __init__(self, input_size, num_classes):
-#         super().__init__()
-#         self.fc1 = nn.Linear(input_size, 50)
-#         self.fc2 = nn.Linear(50, num_classes)
-        
-#     def forward(self, x):
-#         x = F.relu(self.fc1(x))
-#         x = self.fc2(x)
-#         return x
 
 class NN(L.LightningModule):
     def __init__(self, input_size, num_classes):
         super().__init__()
         self.fc1 = nn.Linear(input_size, 50)
         self.fc2 = nn.Linear(50, num_classes)
-        self.loss_fn = F.cross_entropy()
-        
+        self.loss_fn = nn.CrossEntropyLoss()
+
     def forward(self, x):
-        return self.fc2(F.relu(self.fc1(x)))
-    
-    #since we have the same thing on train, val, test step
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
+    def training_step(self, batch, batch_idx):
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("train_loss", loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("val_loss", loss)
+        return loss
+
+    def test_step(self, batch, batch_idx):
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("test_loss", loss)
+        return loss
+
     def _common_step(self, batch, batch_idx):
         x, y = batch
-        x = x.reshape(x.size[0], -1)
-        y_pred = self(x)
+        x = x.reshape(x.size(0), -1)
+        y_pred = self.forward(x)
         loss = self.loss_fn(y_pred, y)
-        return loss,y_pred, y
-    
-    # note: we didnt have to do optimizer.zero_grad(), loss.backward(), or the optimizer.step() in lightning
-    def training_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('train_loss', loss)
-        return loss
-    
-    def validation_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('val_loss', loss)
-        return loss
-    
-    def test_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('test_loss', loss)
-        return loss
-    
-    def predict_step(self, batch, batch_idx) -> Any:
+        return loss, y_pred, y
+
+    def predict_step(self, batch, batch_idx):
         x, y = batch
-        x = x.reshape(x.size[0], -1)
-        y_pred = self(x)
+        x = x.reshape(x.size(0), -1)
+        y_pred = self.forward(x)
         preds = torch.argmax(y_pred, dim=1)
         return preds
-    
-    def configure_optimizers(self) -> OptimizerLRScheduler:
+
+    def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=0.001)
-    
-    
-    
-    
-    
-    
+
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -90,7 +73,7 @@ test_ds = datasets.MNIST(
     root="dataset/", train=False, transform=transforms.ToTensor(), download=True
 )
 train_loader = DataLoader(dataset=train_ds, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(dataset=val_ds, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(dataset=val_ds, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(dataset=test_ds, batch_size=batch_size, shuffle=False)
 
 # Initialize network
@@ -100,27 +83,17 @@ model = NN(input_size=input_size, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-# Train Network
-for epoch in range(num_epochs):
-    for batch_idx, (data, targets) in enumerate(tqdm(train_loader)):
-        # Get data to cuda if possible
-        data = data.to(device=device)
-        targets = targets.to(device=device)
-
-        # Get to correct shape
-        data = data.reshape(data.shape[0], -1)
-
-        # Forward
-        scores = model(data)
-        loss = criterion(scores, targets)
-
-        # Backward
-        optimizer.zero_grad()
-        loss.backward()
-
-        # Gradient descent or adam step
-        optimizer.step()
-
+trainer = L.Trainer(
+    accelerator="gpu", 
+    devices=1, 
+    min_epochs=1, 
+    max_epochs=3, 
+    precision=32
+)
+#trainer.tune() to find out optimal hyperparams
+trainer.fit(model, train_loader, val_loader)
+trainer.validate(model, val_loader)
+trainer.test(model, test_loader)
 
 # Check accuracy on training & test to see how good our model
 def check_accuracy(loader, model):
@@ -141,8 +114,8 @@ def check_accuracy(loader, model):
             x = x.reshape(x.shape[0], -1)
 
             # Forward pass
-            scores = model(x)
-            _, predictions = scores.max(1)
+            y_pred = model(x)
+            _, predictions = y_pred.max(1)
 
             # Check how many we got correct
             num_correct += (predictions == y).sum()
