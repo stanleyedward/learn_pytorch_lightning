@@ -1,3 +1,4 @@
+from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 import torch
 import torch.nn.functional as F
 import torchvision.datasets as datasets
@@ -76,6 +77,56 @@ class NN(L.LightningModule):
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=0.001)
 
+class MNISTDataModule(L.LightningDataModule):
+    def __init__(self, data_dir, batch_size, num_workers):
+        super().__init__()
+        self.data_dir = data_dir
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        
+    def prepare_data(self) -> None:
+        datasets.MNIST(root=self.data_dir, train=True)
+        datasets.MNIST(root=self.data_dir, train=False)
+        
+    def setup(self, stage: str) -> None:
+        entire_dataset = datasets.MNIST(
+            root=self.data_dir,
+            train=True,
+            transform=transforms.ToTensor(),
+            download=False
+        )
+        self.train_dataset, self.val_dataset = random_split(entire_dataset, [50000, 10000])
+        
+        self.test_dataset = datasets.MNIST(
+            root=self.data_dir,
+            train=False,
+            transform=transforms.ToTensor(),
+            download=False
+        )
+        
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        return DataLoader(
+            dataset=self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=True
+        )
+    
+    def val_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(
+            dataset=self.val_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False
+        )
+    
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(
+            dataset=self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=False
+        )
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -87,25 +138,13 @@ learning_rate = 0.001
 batch_size = 64
 num_epochs = 3
 
-# Load Data
-entire_dataset = datasets.MNIST(
-    root="dataset/", train=True, transform=transforms.ToTensor(), download=True
-)
-train_ds, val_ds = random_split(entire_dataset, [50000, 10000])
-test_ds = datasets.MNIST(
-    root="dataset/", train=False, transform=transforms.ToTensor(), download=True
-)
-train_loader = DataLoader(dataset=train_ds, batch_size=batch_size, shuffle=True)
-val_loader = DataLoader(dataset=val_ds, batch_size=batch_size, shuffle=False)
-test_loader = DataLoader(dataset=test_ds, batch_size=batch_size, shuffle=False)
+#Load the dataset and dataloaders
+datamodule = MNISTDataModule(data_dir='dataset/', batch_size=batch_size, num_workers=4)
 
 # Initialize network
 model = NN(input_size=input_size, num_classes=num_classes).to(device)
 
-# Loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
+#Setup the trainer
 trainer = L.Trainer(
     accelerator="gpu", 
     devices=1, 
@@ -114,6 +153,6 @@ trainer = L.Trainer(
     precision=32
 )
 #trainer.tune() to find out optimal hyperparams
-trainer.fit(model, train_loader, val_loader)
-trainer.validate(model, val_loader)
-trainer.test(model, test_loader)
+trainer.fit(model, datamodule=datamodule)
+trainer.validate(model, datamodule=datamodule)
+trainer.test(model, datamodule=datamodule)
