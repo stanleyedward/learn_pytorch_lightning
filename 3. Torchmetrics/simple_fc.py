@@ -10,7 +10,8 @@ import lightning as L
 import torchmetrics
 from torchmetrics import Metric
 
-#making our own accuracy metric
+
+# making our own accuracy metric
 class MyAccuracy(Metric):
     def __init__(self):
         super().__init__()
@@ -19,22 +20,25 @@ class MyAccuracy(Metric):
 
     def update(self, preds, target):
         preds = torch.argmax(preds, dim=1)
-        assert preds.shape == target.shape, 'preds and target must have the same shape'
+        assert preds.shape == target.shape, "preds and target must have the same shape"
         self.correct += torch.sum(preds == target)
         self.total += target.numel()
 
     def compute(self):
         return self.correct.float() / self.total.float()
-        
+
+
 class NN(L.LightningModule):
     def __init__(self, input_size, num_classes):
         super().__init__()
         self.fc1 = nn.Linear(input_size, 50)
         self.fc2 = nn.Linear(50, num_classes)
         self.loss_fn = nn.CrossEntropyLoss()
-        self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
+        self.accuracy = torchmetrics.Accuracy(
+            task="multiclass", num_classes=num_classes
+        )
         self.my_accuracy = MyAccuracy()
-        self.f1_score = torchmetrics.F1Score(task='multiclass', num_classes=num_classes)
+        self.f1_score = torchmetrics.F1Score(task="multiclass", num_classes=num_classes)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -45,8 +49,16 @@ class NN(L.LightningModule):
         loss, y_pred, y = self._common_step(batch, batch_idx)
         accuracy = self.my_accuracy(y_pred, y)
         f1_score = self.f1_score(y_pred, y)
-        self.log_dict({'train_loss': loss, 'train_accuracy': accuracy, 'train_f1_score': f1_score},
-                      on_step=False, on_epoch=True, prog_bar=True) 
+        self.log_dict(
+            {
+                "train_loss": loss,
+                "train_accuracy": accuracy,
+                "train_f1_score": f1_score,
+            },
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+        )
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -107,13 +119,9 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 trainer = L.Trainer(
-    accelerator="gpu", 
-    devices=1, 
-    min_epochs=1, 
-    max_epochs=3, 
-    precision=32
+    accelerator="gpu", devices=1, min_epochs=1, max_epochs=3, precision=32
 )
-#trainer.tune() to find out optimal hyperparams
+# trainer.tune() to find out optimal hyperparams
 trainer.fit(model, train_loader, val_loader)
 trainer.validate(model, val_loader)
 trainer.test(model, test_loader)

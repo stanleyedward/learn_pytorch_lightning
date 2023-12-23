@@ -15,11 +15,12 @@ import lightning as L
 #         super().__init__()
 #         self.fc1 = nn.Linear(input_size, 50)
 #         self.fc2 = nn.Linear(50, num_classes)
-        
+
 #     def forward(self, x):
 #         x = F.relu(self.fc1(x))
 #         x = self.fc2(x)
 #         return x
+
 
 class NN(L.LightningModule):
     def __init__(self, input_size, num_classes):
@@ -27,49 +28,44 @@ class NN(L.LightningModule):
         self.fc1 = nn.Linear(input_size, 50)
         self.fc2 = nn.Linear(50, num_classes)
         self.loss_fn = F.cross_entropy()
-        
+
     def forward(self, x):
         return self.fc2(F.relu(self.fc1(x)))
-    
-    #since we have the same thing on train, val, test step
+
+    # since we have the same thing on train, val, test step
     def _common_step(self, batch, batch_idx):
         x, y = batch
         x = x.reshape(x.size[0], -1)
         y_pred = self(x)
         loss = self.loss_fn(y_pred, y)
-        return loss,y_pred, y
-    
+        return loss, y_pred, y
+
     # note: we didnt have to do optimizer.zero_grad(), loss.backward(), or the optimizer.step() in lightning
     def training_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('train_loss', loss)
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("train_loss", loss)
         return loss
-    
+
     def validation_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('val_loss', loss)
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("val_loss", loss)
         return loss
-    
+
     def test_step(self, batch, batch_idx) -> STEP_OUTPUT:
-        loss, y_pred,y = self._common_step(batch, batch_idx)
-        self.log('test_loss', loss)
+        loss, y_pred, y = self._common_step(batch, batch_idx)
+        self.log("test_loss", loss)
         return loss
-    
+
     def predict_step(self, batch, batch_idx) -> Any:
         x, y = batch
         x = x.reshape(x.size[0], -1)
         y_pred = self(x)
         preds = torch.argmax(y_pred, dim=1)
         return preds
-    
+
     def configure_optimizers(self) -> OptimizerLRScheduler:
         return optim.Adam(self.parameters(), lr=0.001)
-    
-    
-    
-    
-    
-    
+
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -132,7 +128,6 @@ def check_accuracy(loader, model):
     with torch.no_grad():
         # Loop through the data
         for x, y in loader:
-
             # Move data to device
             x = x.to(device=device)
             y = y.to(device=device)

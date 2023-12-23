@@ -84,16 +84,13 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 trainer = L.Trainer(
-    accelerator="gpu", 
-    devices=1, 
-    min_epochs=1, 
-    max_epochs=3, 
-    precision=32
+    accelerator="gpu", devices=1, min_epochs=1, max_epochs=3, precision=32
 )
-#trainer.tune() to find out optimal hyperparams
+# trainer.tune() to find out optimal hyperparams
 trainer.fit(model, train_loader, val_loader)
 trainer.validate(model, val_loader)
 trainer.test(model, test_loader)
+
 
 # Check accuracy on training & test to see how good our model
 def check_accuracy(loader, model):
@@ -105,7 +102,6 @@ def check_accuracy(loader, model):
     with torch.no_grad():
         # Loop through the data
         for x, y in loader:
-
             # Move data to device
             x = x.to(device=device)
             y = y.to(device=device)

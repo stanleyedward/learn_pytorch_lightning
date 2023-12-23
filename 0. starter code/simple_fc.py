@@ -81,7 +81,6 @@ def check_accuracy(loader, model):
     with torch.no_grad():
         # Loop through the data
         for x, y in loader:
-
             # Move data to device
             x = x.to(device=device)
             y = y.to(device=device)
