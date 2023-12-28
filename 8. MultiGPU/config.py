@@ -14,4 +14,4 @@ NUM_WORKERS = 4
 PROFILER = None
 ACCELERATOR = "gpu"
 DEVICES = [0]
-PRECISION = '16-mixed'
+PRECISION = "16-mixed"

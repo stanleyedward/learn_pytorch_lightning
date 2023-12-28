@@ -7,7 +7,7 @@ from lightning.pytorch.profilers import PyTorchProfiler
 
 if __name__ == "__main__":
     profiler = PyTorchProfiler()
-    
+
     datamodule = MnistDataModule(
         data_dir=config.DATA_DIR,
         batch_size=config.BATCH_SIZE,

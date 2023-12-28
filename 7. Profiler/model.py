@@ -28,22 +28,24 @@ class NN(L.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         loss, y_pred, y = self._common_step(batch, batch_idx)
-        metric = {'loss': loss, 'y_pred':y_pred, 'y': y}
+        metric = {"loss": loss, "y_pred": y_pred, "y": y}
         self.training_step_outputs.append(metric)
         return loss
-        
+
     def on_train_epoch_end(self):
-        avg_loss = torch.stack([x['loss'] for x in self.training_step_outputs]).mean()
-        y_pred = torch.cat([x['y_pred'] for x in self.training_step_outputs])
+        avg_loss = torch.stack([x["loss"] for x in self.training_step_outputs]).mean()
+        y_pred = torch.cat([x["y_pred"] for x in self.training_step_outputs])
         y = torch.cat([x["y"] for x in self.training_step_outputs])
-        self.log_dict({
-            'avg_loss': avg_loss,
-            'train_acc': self.my_accuracy(y_pred, y),
-            'train_f1': self.f1_score(y_pred, y)
+        self.log_dict(
+            {
+                "avg_loss": avg_loss,
+                "train_acc": self.my_accuracy(y_pred, y),
+                "train_f1": self.f1_score(y_pred, y),
             },
-                 prog_bar=True,
-                 on_epoch=True,
-                 on_step=False)
+            prog_bar=True,
+            on_epoch=True,
+            on_step=False,
+        )
         self.training_step_outputs.clear()
 
     def validation_step(self, batch, batch_idx):

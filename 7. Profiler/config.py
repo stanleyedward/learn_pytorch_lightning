@@ -11,7 +11,7 @@ DATA_DIR = "dataset/"
 NUM_WORKERS = 4
 
 # Compute relatied
-PROFILER = 'simple'
+PROFILER = "simple"
 ACCELERATOR = "gpu"
 DEVICES = [0]
 PRECISION = 16

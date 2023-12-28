@@ -22,7 +22,7 @@ if __name__ == "__main__":
     )
 
     trainer = L.Trainer(
-        strategy=strategy, #Data Distributed Parallel for Multi-GPU from deep speed
+        strategy=strategy,  # Data Distributed Parallel for Multi-GPU from deep speed
         profiler=config.PROFILER,
         accelerator=config.ACCELERATOR,
         devices=config.DEVICES,
