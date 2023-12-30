@@ -1,0 +1,1 @@
+https://wandb.ai/stanleyedward/first%20MNIST%20using%20lightning

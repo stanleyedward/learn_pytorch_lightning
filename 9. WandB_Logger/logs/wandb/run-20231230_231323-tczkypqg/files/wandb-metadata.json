@@ -1,0 +1,88 @@
+{
+    "os": "Linux-6.6.8-arch1-1-x86_64-with-glibc2.38",
+    "python": "3.11.5",
+    "heartbeatAt": "2023-12-30T17:43:25.296827",
+    "startedAt": "2023-12-30T17:43:23.560337",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/stanley/Documents/ml/learn_pytorch_lightning/9. Logger/train.py",
+    "codePathLocal": "9. Logger/train.py",
+    "codePath": "9. Logger/train.py",
+    "git": {
+        "remote": "https://github.com/stanleyedward/learn_pytorch_lightning.git",
+        "commit": "9e79a8339b88453c44ca0ac059f67c258dcf91ec"
+    },
+    "email": "stanleyedward9715@gmail.com",
+    "root": "/home/stanley/Documents/ml/learn_pytorch_lightning",
+    "host": "zeph",
+    "username": "stanley",
+    "executable": "/home/stanley/miniconda3/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 3297.532625,
+        "min": 1400.0,
+        "max": 2300.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1557.0,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 1557.075,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3883.126,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3892.726,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3880.012,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3892.823,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3875.722,
+            "min": 1400.0,
+            "max": 2300.0
+        },
+        {
+            "current": 3878.403,
+            "min": 1400.0,
+            "max": 2300.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 188.95969009399414,
+            "used": 36.928062438964844
+        }
+    },
+    "gpu": "NVIDIA GeForce GTX 1660 Ti with Max-Q Design",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce GTX 1660 Ti with Max-Q Design",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 15.308734893798828
+    }
+}
