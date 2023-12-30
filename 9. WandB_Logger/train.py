@@ -4,14 +4,16 @@ from dataset import MnistDataModule
 import config
 from callbacks import MyPrintingCallback, EarlyStopping
 from lightning.pytorch.profilers import PyTorchProfiler
-# from lightning.pytorch.strategies import DeepSpeedStrategy
+from lightning.pytorch.strategies import DeepSpeedStrategy
 import wandb
 from lightning.pytorch.loggers import WandbLogger
 
 if __name__ == "__main__":
     profiler = PyTorchProfiler()
-    # strategy = DeepSpeedStrategy()
-    wandb_logger = WandbLogger(project='first MNIST using lightning', save_dir=r'9. WandB_Logger/logs')
+    strategy = DeepSpeedStrategy()
+    wandb_logger = WandbLogger(
+        project="first MNIST using lightning", save_dir=r"9. WandB_Logger/logs"
+    )
     datamodule = MnistDataModule(
         data_dir=config.DATA_DIR,
         batch_size=config.BATCH_SIZE,
@@ -25,7 +27,7 @@ if __name__ == "__main__":
     )
 
     trainer = L.Trainer(
-        strategy='auto',  
+        strategy="auto",
         profiler=config.PROFILER,
         accelerator=config.ACCELERATOR,
         devices=config.DEVICES,
@@ -33,12 +35,12 @@ if __name__ == "__main__":
         max_epochs=config.MAX_NUM_EPOCHS,
         precision=config.PRECISION,
         callbacks=[MyPrintingCallback(), EarlyStopping(monitor="val_loss")],
-        logger=wandb_logger
+        logger=wandb_logger,
     )
-    
+
     # trainer.tune() to find out optimal hyperparams
     trainer.fit(model, datamodule=datamodule)
     trainer.validate(model, datamodule=datamodule)
     trainer.test(model, datamodule=datamodule)
-    
+
     wandb.finish()
