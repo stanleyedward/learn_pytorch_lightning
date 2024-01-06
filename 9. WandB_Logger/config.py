@@ -15,3 +15,4 @@ PROFILER = None
 ACCELERATOR = "gpu"
 DEVICES = [0]
 PRECISION = "16-mixed"
+STRATEGY = "deepspeed"

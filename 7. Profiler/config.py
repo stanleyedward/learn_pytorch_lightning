@@ -11,7 +11,7 @@ DATA_DIR = "dataset/"
 NUM_WORKERS = 4
 
 # Compute relatied
-PROFILER = "simple"
+PROFILER = "pytorch"
 ACCELERATOR = "gpu"
 DEVICES = [0]
-PRECISION = 16
+PRECISION = "16-mixed"

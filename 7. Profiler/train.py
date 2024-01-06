@@ -21,7 +21,7 @@ if __name__ == "__main__":
     )
 
     trainer = L.Trainer(
-        profiler=profiler,
+        profiler=profiler, #config.PROFILER 
         accelerator=config.ACCELERATOR,
         devices=config.DEVICES,
         min_epochs=config.MIN_NUM_EPOCHS,
