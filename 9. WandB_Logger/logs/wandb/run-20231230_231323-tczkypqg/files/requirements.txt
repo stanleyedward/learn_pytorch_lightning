@@ -69,7 +69,7 @@ pip==23.3
 platformdirs==4.1.0
 plotly==5.18.0
 pluggy==1.0.0
-protobuf==3.20.0
+protobuf==3.20.2
 psutil==5.9.6
 pycosat==0.6.6
 pycparser==2.21
