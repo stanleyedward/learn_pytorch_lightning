@@ -7,7 +7,7 @@ from metrics import MyAccuracy
 
 
 class NN(L.LightningModule):
-    def __init__(self, input_size, learning_rate, num_classes):
+    def __init__(self, input_size:int = 784, learning_rate:float=0.001, num_classes:int =10):
         super().__init__()
         # log hparams
         self.save_hyperparameters()
