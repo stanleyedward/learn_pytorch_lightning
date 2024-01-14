@@ -4,6 +4,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
 import lightning as L
+from lightning.pytorch.demos.boring_classes import BoringDataModule
 
 
 class MnistDataModule(L.LightningDataModule):

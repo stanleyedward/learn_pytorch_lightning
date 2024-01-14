@@ -4,6 +4,7 @@ from torch import nn, optim
 import lightning as L
 import torchmetrics
 from metrics import MyAccuracy
+from lightning.pytorch.demos.boring_classes import BoringModel
 
 
 class NN(L.LightningModule):
@@ -77,3 +78,15 @@ class NN(L.LightningModule):
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.learning_rate)
+    
+# MODELS    
+class Model1(BoringModel):
+    def configure_optimizers(self):
+        print("⚡", "using Model1", "⚡")
+        return super().configure_optimizers()
+
+
+class Model2(BoringModel):
+    def configure_optimizers(self):
+        print("⚡", "using Model2", "⚡")
+        return super().configure_optimizers()
