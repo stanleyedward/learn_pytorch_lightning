@@ -73,7 +73,7 @@ class NN(L.LightningModule):
 
     def predict_step(self, batch, batch_idx):
         x, y = batch
-        x = x.reshape(x.size(0), -1)
+        x = x.reshape(x.size(0), -1) #nn.Flatten
         y_pred = self.forward(x)
         preds = torch.argmax(y_pred, dim=1)
         return preds
