@@ -13,7 +13,6 @@ class NN(L.LightningModule):
     ):
         super().__init__()
         # log hparams
-        self.save_hyperparameters()
         self.fc1 = nn.Linear(input_size, 50)
         self.fc2 = nn.Linear(50, num_classes)
         self.loss_fn = nn.CrossEntropyLoss()
@@ -23,6 +22,7 @@ class NN(L.LightningModule):
         )
         self.my_accuracy = MyAccuracy()
         self.f1_score = torchmetrics.F1Score(task="multiclass", num_classes=num_classes)
+        self.save_hyperparameters()
         self.training_step_outputs = []
 
     def forward(self, x):
