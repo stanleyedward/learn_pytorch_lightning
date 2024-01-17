@@ -8,7 +8,9 @@ from lightning.pytorch.demos.boring_classes import BoringModel
 
 
 class NN(L.LightningModule):
-    def __init__(self, input_size:int = 784, learning_rate:float=0.001, num_classes:int =10):
+    def __init__(
+        self, input_size: int = 784, learning_rate: float = 0.001, num_classes: int = 10
+    ):
         super().__init__()
         # log hparams
         self.save_hyperparameters()
@@ -78,8 +80,9 @@ class NN(L.LightningModule):
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.learning_rate)
-    
-# MODELS    
+
+
+# MODELS
 class Model1(BoringModel):
     def configure_optimizers(self):
         print("⚡", "using Model1", "⚡")

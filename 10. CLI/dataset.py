@@ -8,7 +8,9 @@ from lightning.pytorch.demos.boring_classes import BoringDataModule
 
 
 class MnistDataModule(L.LightningDataModule):
-    def __init__(self, data_dir:str="dataset/", batch_size:int = 64, num_workers:int=7):
+    def __init__(
+        self, data_dir: str = "dataset/", batch_size: int = 64, num_workers: int = 7
+    ):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size

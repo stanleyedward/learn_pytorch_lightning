@@ -10,7 +10,7 @@ MAX_NUM_EPOCHS = 3
 DATA_DIR = "dataset/"
 NUM_WORKERS = 4
 
-#logs
+# logs
 LOGS_DIR = "10. CLI/logs"
 
 # Compute relatied
